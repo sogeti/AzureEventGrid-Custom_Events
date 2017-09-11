@@ -29,6 +29,7 @@ namespace EventGrid.Subscriber.Controllers
             var validationEvent = values.SingleOrDefault();
             if (validationEvent != null)
             {
+                // TODO: Validate that we are prepared to actually handle these events to avoid opening up to DDoS
                 return new JsonResult(new SubscriptionValidationResponse { ValidationResponse = validationEvent.Data.validationCode });
             }
             return BadRequest();

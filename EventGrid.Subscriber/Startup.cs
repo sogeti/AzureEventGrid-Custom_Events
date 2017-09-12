@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using EventGrid.Subscriber.AuthorizationPolicy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
@@ -19,6 +22,16 @@ namespace EventGrid.Subscriber
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            // This requires incoming calls to include a key in the query string (e.g. https://endpoint?key=<yourkey>
+            // This can be included in the endpoint URL when registering the subscription in Azure Event Grid
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("KeyRequired",
+                    policy => policy.Requirements.Add(new KeyRequirement("70EDC39E-D2EB-4C2F-8D2B-81EBF8CFB558")));
+                // TODO: you may want to generate a cryptographically random key instead of this GUID, not hardcode it, etc
+            });
+            services.AddSingleton<IAuthorizationHandler, KeyHandler>();
 
             services.AddSwaggerGen(c =>
             {

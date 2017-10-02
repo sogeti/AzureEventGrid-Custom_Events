@@ -30,6 +30,8 @@ namespace EventGrid.Subscriber
                 options.AddPolicy("KeyRequired",
                     policy => policy.Requirements.Add(new KeyRequirement("70EDC39E-D2EB-4C2F-8D2B-81EBF8CFB558")));
                 // TODO: you may want to generate a cryptographically random key instead of this GUID, not hardcode it, etc
+                // Notice that Event Grid is passing the key as-is, while it is being URL-decoded on the receiving side.
+                // So make sure that you specify a URL-encoded key when registering it in Event Grid
             });
             services.AddSingleton<IAuthorizationHandler, KeyHandler>();
 
